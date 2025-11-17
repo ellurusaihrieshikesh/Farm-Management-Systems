@@ -1,0 +1,19 @@
+{
+  "export_date": "2025-10-26 13:27:13",
+  "database": "db.sqlite3",
+  "users": [
+    {
+      "id": 1,
+      "username": "Bunny",
+      "email": "kkuragayala2004@gmail.com",
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "date_joined": "2025-10-26 07:49:54",
+      "last_login": "2025-10-26 07:50:48"
+    }
+  ],
+  "farms": []
+}

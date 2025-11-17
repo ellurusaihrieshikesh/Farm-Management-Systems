@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Farm Management Portal - Presentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .slide {
+            display: none;
+            min-height: 100vh;
+            padding: 60px 40px;
+            background: white;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .slide.active {
+            display: block;
+        }
+        .slide h1 {
+            color: #28a745;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .slide h2 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #28a745;
+            padding-bottom: 10px;
+        }
+        .slide h3 {
+            color: #28a745;
+            font-size: 1.8rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .feature-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #28a745;
+        }
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .tech-badge {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card h4 {
+            font-size: 3rem;
+            margin: 0;
+            font-weight: bold;
+        }
+        .stat-card p {
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        .nav-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            margin: 5px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .icon-large {
+            font-size: 4rem;
+            color: #28a745;
+            margin: 20px;
+        }
+        ul.feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        ul.feature-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        ul.feature-list li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / 5
+    </div>
+
+    <!-- Slide 1: Project Overview -->
+    <div class="slide active">
+        <div class="text-center">
+            <i class="bi bi-flower1 icon-large"></i>
+            <h1>🌾 Digital Farm Management Portal</h1>
+            <h2>A Comprehensive Django Web Application</h2>
+            
+            <div class="feature-box mt-4">
+                <h3>Problem Statement</h3>
+                <p class="lead">Farmers need a centralized system to manage multiple farms, track financial operations, schedule crop activities, and get AI-powered farming advice.</p>
+            </div>
+
+            <div class="feature-box mt-4">
+                <h3>Our Solution</h3>
+                <div class="tech-stack justify-content-center">
+                    <span class="tech-badge">✅ Multi-Farm Management</span>
+                    <span class="tech-badge">💰 Financial Tracking</span>
+                    <span class="tech-badge">📅 Crop Scheduling</span>
+                    <span class="tech-badge">🤖 AI Assistance</span>
+                </div>
+            </div>
+
+            <div class="feature-box mt-4">
+                <h3>Technology Stack</h3>
+                <div class="tech-stack justify-content-center">
+                    <span class="tech-badge">Django 4.2</span>
+                    <span class="tech-badge">Bootstrap 5.3</span>
+                    <span class="tech-badge">SQLite</span>
+                    <span class="tech-badge">Gemini API</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Key Features -->
+    <div class="slide">
+        <h2>🎯 Core Features</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3><i class="bi bi-tractor"></i> Farm Management</h3>
+                    <ul class="feature-list">
+                        <li>Complete CRUD operations</li>
+                        <li>Multi-farm support per user</li>
+                        <li>Farm-based todo lists</li>
+                        <li>Track crop types and areas</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3><i class="bi bi-cash-coin"></i> Financial Management</h3>
+                    <ul class="feature-list">
+                        <li>Expense tracking (12 categories)</li>
+                        <li>Income recording</li>
+                        <li>Budget planning & monitoring</li>
+                        <li>Financial dashboard & reports</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3><i class="bi bi-calendar-check"></i> Crop Calendar</h3>
+                    <ul class="feature-list">
+                        <li>Monthly calendar view</li>
+                        <li>9 crop lifecycle stages</li>
+                        <li>Event scheduling</li>
+                        <li>Automated reminders</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3><i class="bi bi-robot"></i> AI Chatbot</h3>
+                    <ul class="feature-list">
+                        <li>Gemini API integration</li>
+                        <li>Real-time farming advice</li>
+                        <li>Crop-specific recommendations</li>
+                        <li>Problem-solving assistance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Technical Implementation -->
+    <div class="slide">
+        <h2>🏗️ Technical Architecture</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>8</h4>
+                <p>Database Models</p>
+            </div>
+            <div class="stat-card">
+                <h4>18+</h4>
+                <p>Views</p>
+            </div>
+            <div class="stat-card">
+                <h4>20+</h4>
+                <p>Templates</p>
+            </div>
+            <div class="stat-card">
+                <h4>45+</h4>
+                <p>URL Routes</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3>Backend Implementation</h3>
+                    <ul class="feature-list">
+                        <li>Django Models with relationships</li>
+                        <li>User authentication & security</li>
+                        <li>Complete CRUD operations</li>
+                        <li>Error handling & validation</li>
+                        <li>API integration (Gemini AI)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3>Frontend Design</h3>
+                    <ul class="feature-list">
+                        <li>Bootstrap 5 responsive design</li>
+                        <li>20+ professional templates</li>
+                        <li>Intuitive navigation</li>
+                        <li>User-friendly forms</li>
+                        <li>Visual feedback system</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-box mt-4">
+            <h3>Key Technical Skills Demonstrated</h3>
+            <div class="tech-stack">
+                <span class="tech-badge">Django Framework</span>
+                <span class="tech-badge">Database Design</span>
+                <span class="tech-badge">RESTful APIs</span>
+                <span class="tech-badge">Frontend Development</span>
+                <span class="tech-badge">Security Best Practices</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Project Demonstration -->
+    <div class="slide">
+        <h2>🎬 Live Demo Highlights</h2>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-box text-center">
+                    <i class="bi bi-shield-lock icon-large"></i>
+                    <h3>Authentication</h3>
+                    <p>Secure user registration and login system</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box text-center">
+                    <i class="bi bi-speedometer2 icon-large"></i>
+                    <h3>Dashboard</h3>
+                    <p>Overview of farms, crops, activities, and finances</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box text-center">
+                    <i class="bi bi-tractor icon-large"></i>
+                    <h3>Farm Management</h3>
+                    <p>Add, edit, delete farms with full CRUD operations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="feature-box text-center">
+                    <i class="bi bi-cash-stack icon-large"></i>
+                    <h3>Financial Tracking</h3>
+                    <p>Expenses, income, budgets with detailed reports</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box text-center">
+                    <i class="bi bi-calendar3 icon-large"></i>
+                    <h3>Crop Calendar</h3>
+                    <p>Monthly view, stage tracking, event scheduling</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box text-center">
+                    <i class="bi bi-chat-dots icon-large"></i>
+                    <h3>AI Assistant</h3>
+                    <p>Real-time farming advice and recommendations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-box mt-4 text-center">
+            <h3>Project Statistics</h3>
+            <div class="tech-stack justify-content-center">
+                <span class="tech-badge">100% Feature Complete</span>
+                <span class="tech-badge">Production Ready</span>
+                <span class="tech-badge">Well Documented</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Conclusion & Future Scope -->
+    <div class="slide">
+        <h2>🎯 Project Summary & Future Enhancements</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3>✅ What We've Achieved</h3>
+                    <ul class="feature-list">
+                        <li>Complete farm management system</li>
+                        <li>Comprehensive financial tracking</li>
+                        <li>Crop scheduling and calendar</li>
+                        <li>AI-powered assistance</li>
+                        <li>Professional, user-friendly interface</li>
+                        <li>Secure, scalable architecture</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-box">
+                    <h3>💼 Business Value</h3>
+                    <ul class="feature-list">
+                        <li>Solves real farming problems</li>
+                        <li>Time-saving centralized system</li>
+                        <li>Better financial control</li>
+                        <li>Improved planning & scheduling</li>
+                        <li>AI-powered knowledge base</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-box mt-4">
+            <h3>🚀 Future Enhancements</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>Phase 2:</strong>
+                    <ul>
+                        <li>Inventory Management</li>
+                        <li>Weather Integration</li>
+                        <li>Notes & Journal</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <strong>Phase 3:</strong>
+                    <ul>
+                        <li>Email/SMS Notifications</li>
+                        <li>Soil Health Tracking</li>
+                        <li>Harvest Management</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <strong>Phase 4:</strong>
+                    <ul>
+                        <li>Mobile App</li>
+                        <li>IoT Integration</li>
+                        <li>Advanced Analytics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-box mt-4 text-center">
+            <h3>Key Takeaways</h3>
+            <div class="tech-stack justify-content-center">
+                <span class="tech-badge">Comprehensive Solution</span>
+                <span class="tech-badge">Modern Technology</span>
+                <span class="tech-badge">User-Centric Design</span>
+                <span class="tech-badge">Scalable Architecture</span>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <h1 style="color: #28a745;">Thank You! 🙏</h1>
+            <p class="lead">Questions & Answers</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">
+            <i class="bi bi-arrow-left"></i> Previous
+        </button>
+        <button class="nav-btn" onclick="nextSlide()">
+            Next <i class="bi bi-arrow-right"></i>
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide;
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') previousSlide();
+        });
+
+        // Initialize
+        showSlide(1);
+    </script>
+</body>
+</html>
+
