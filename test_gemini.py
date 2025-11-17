@@ -1,7 +1,7 @@
 import google.generativeai as genai
 
 # Configure the API key
-genai.configure(api_key='AIzaSyD_N1eBFFsh1gk7CVLmy8qUTIgUCAOmdR4')
+genai.configure(api_key='')
 
 # List available models
 print("Available models:")
@@ -15,4 +15,5 @@ try:
     response = model.generate_content("Hello, what's your name?")
     print(f"Response: {response.text}")
 except Exception as e:
+
     print(f"Error: {e}")
