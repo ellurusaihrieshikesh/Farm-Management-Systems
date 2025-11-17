@@ -1,0 +1,230 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Calendar - Farm Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        .calendar-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #28a745;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+        }
+        .calendar-day {
+            min-height: 100px;
+            border: 1px solid #dee2e6;
+            padding: 5px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            position: relative;
+        }
+        .calendar-day.today {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+        .calendar-day.other-month {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .event-badge {
+            font-size: 0.75rem;
+            padding: 2px 5px;
+            margin: 2px 0;
+            border-radius: 3px;
+            display: block;
+            cursor: pointer;
+        }
+        .event-watering { background: #0dcaf0; color: white; }
+        .event-fertilizing { background: #198754; color: white; }
+        .event-pest_control { background: #dc3545; color: white; }
+        .event-weeding { background: #ffc107; color: black; }
+        .event-harvesting { background: #fd7e14; color: white; }
+        .event-other { background: #6c757d; color: white; }
+        .upcoming-events {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .event-item {
+            padding: 10px;
+            border-left: 4px solid #28a745;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .event-item.due-soon {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        .event-item.overdue {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}"><i class="bi bi-flower1"></i> FarmPortal</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'crop_calendar' %}">Crop Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'management' %}">Management</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'financial_overview' %}">Financial</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-calendar3 text-success"></i> Crop Calendar & Scheduling</h2>
+            <div>
+                <a href="{% url 'crop_stages_list' %}" class="btn btn-outline-success">Crop Stages</a>
+                <a href="{% url 'calendar_events_list' %}" class="btn btn-outline-success">All Events</a>
+                <a href="{% url 'add_calendar_event' %}" class="btn btn-success"><i class="bi bi-plus-circle"></i> Add Event</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Calendar View -->
+            <div class="col-lg-8 mb-4">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-success">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </a>
+                        <h4 class="mb-0">{{ month_name }} {{ view_year }}</h4>
+                        <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-success">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="calendar-grid">
+                        <div class="calendar-day-header">Sun</div>
+                        <div class="calendar-day-header">Mon</div>
+                        <div class="calendar-day-header">Tue</div>
+                        <div class="calendar-day-header">Wed</div>
+                        <div class="calendar-day-header">Thu</div>
+                        <div class="calendar-day-header">Fri</div>
+                        <div class="calendar-day-header">Sat</div>
+
+                        {% for week in calendar_days %}
+                            {% for day_data in week %}
+                                {% if day_data %}
+                                    <div class="calendar-day {% if day_data.is_today %}today{% endif %}">
+                                        <div class="day-number">{{ day_data.day }}</div>
+                                        {% for event in day_data.events %}
+                                            <span class="event-badge event-{{ event.event_type }}" 
+                                                  title="{{ event.get_event_type_display }} - {{ event.farm.farm_name }}">
+                                                {{ event.get_event_type_display|truncatewords:2 }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="calendar-day other-month"></div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Upcoming Events -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-clock"></i> Upcoming Events (Next 7 Days)</h5>
+                    </div>
+                    <div class="card-body upcoming-events">
+                        {% if upcoming_events %}
+                            {% for event in upcoming_events %}
+                                <div class="event-item {% if event.is_due_soon %}due-soon{% endif %}">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>{{ event.get_event_type_display }}</strong>
+                                        <span class="badge bg-{% if event.completed %}success{% else %}warning{% endif %}">
+                                            {{ event.date|date:"M d" }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ event.farm.farm_name }}</small>
+                                    {% if event.description %}
+                                        <p class="mb-0 mt-1">{{ event.description|truncatewords:10 }}</p>
+                                    {% endif %}
+                                    <div class="mt-2">
+                                        <a href="{% url 'toggle_calendar_event' event.id %}" class="btn btn-sm btn-outline-success">
+                                            {% if event.completed %}Reopen{% else %}Complete{% endif %}
+                                        </a>
+                                        <a href="{% url 'edit_calendar_event' event.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No upcoming events</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'add_calendar_event' %}" class="btn btn-success w-100 mb-2">
+                            <i class="bi bi-plus-circle"></i> Add Calendar Event
+                        </a>
+                        <a href="{% url 'add_crop_stage' %}" class="btn btn-outline-success w-100 mb-2">
+                            <i class="bi bi-plus-circle"></i> Add Crop Stage
+                        </a>
+                        <a href="{% url 'crop_stages_list' %}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-list"></i> View All Stages
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

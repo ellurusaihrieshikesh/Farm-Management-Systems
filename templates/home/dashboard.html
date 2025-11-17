@@ -1,0 +1,571 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Farm Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/todo.css' %}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
+                <i class="bi bi-flower1"></i> FarmPortal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'crop_calendar' %}">Crop Calendar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'management' %}">Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'financial_overview' %}">Financial</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'edit_profile' %}">Welcome, {{ user.username }}!</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="container mt-5">
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-12">
+                <h1 class="display-4 mb-4">Dashboard</h1>
+                <p class="lead text-muted">Welcome to your Farm Management Portal!</p>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mt-4">
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title">Farms</h5>
+                        <p class="card-text display-6">{{ farms_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h5 class="card-title">Crops</h5>
+                        <p class="card-text display-6">{{ farms_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">Activities</h5>
+                        <p class="card-text display-6">{{ todos_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <h5 class="card-title">Expenses (30d)</h5>
+                        <p class="card-text display-6">₹{{ total_expenses|floatformat:0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Financial Summary (Last 30 Days)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h6 class="text-muted">Total Income</h6>
+                                <h4 class="text-success">₹{{ total_income|floatformat:2 }}</h4>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-muted">Total Expenses</h6>
+                                <h4 class="text-danger">₹{{ total_expenses|floatformat:2 }}</h4>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-muted">Net Profit</h6>
+                                <h4 class="{% if net_profit >= 0 %}text-success{% else %}text-danger{% endif %}">₹{{ net_profit|floatformat:2 }}</h4>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'financial_overview' %}" class="btn btn-success">
+                                <i class="bi bi-graph-up"></i> View Full Financial Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <h3 class="text-success mb-3">Quick Actions</h3>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a href="{% url 'management' %}" class="btn btn-success btn-lg px-4 py-3 rounded-pill shadow">
+                                <i class="bi bi-building"></i> Manage Farms
+                            </a>
+                            <a href="{% url 'financial_overview' %}" class="btn btn-info btn-lg px-4 py-3 rounded-pill shadow">
+                                <i class="bi bi-cash-stack"></i> Financial Management
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Todo List Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="text-success"><i class="bi bi-list-check"></i> Farm To-Do List</h3>
+                    {% if user_farms %}
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTodoModal">
+                        <i class="bi bi-plus-circle"></i> Add Task
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% if not user_farms %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Please add a farm first before creating todos.
+                    <a href="{% url 'management' %}" class="alert-link">Go to Management</a>
+                </div>
+                {% elif not todos %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-clipboard-check display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">No Tasks Yet</h4>
+                        <p class="text-muted">Click "Add Task" to create your first farm task!</p>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Todo Cards Grid -->
+                <div class="row g-3">
+                    {% for todo in todos %}
+                    <div class="col-md-4 col-lg-3">
+                        <div class="todo-card {% if todo.completed %}completed{% endif %} priority-{{ todo.priority }}">
+                            <div class="todo-header">
+                                <span class="farm-badge">
+                                    <i class="bi bi-building"></i> {{ todo.farm.farm_name }}
+                                </span>
+                                <span class="priority-badge badge bg-{{ todo.priority }}">
+                                    {% if todo.priority == 'high' %}High{% elif todo.priority == 'medium' %}Med{% else %}Low{% endif %}
+                                </span>
+                            </div>
+                            <div class="todo-body">
+                                <h6 class="todo-task {% if todo.completed %}text-decoration-line-through{% endif %}">
+                                    {{ todo.task }}
+                                </h6>
+                                {% if todo.description %}
+                                <p class="todo-description">{{ todo.description|truncatewords:10 }}</p>
+                                {% endif %}
+                                {% if todo.due_date %}
+                                <p class="todo-date">
+                                    <i class="bi bi-calendar-event"></i> {{ todo.due_date|date:"M d, Y" }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="todo-footer">
+                                <a href="{% url 'toggle_todo' todo.id %}" 
+                                   class="btn btn-sm {% if todo.completed %}btn-secondary{% else %}btn-success{% endif %}" 
+                                   title="{% if todo.completed %}Mark as incomplete{% else %}Mark as complete{% endif %}">
+                                    <i class="bi bi-check2{% if todo.completed %}-circle{% endif %}"></i>
+                                </a>
+                                <a href="{% url 'delete_todo' todo.id %}" 
+                                   class="btn btn-sm btn-danger" 
+                                   title="Delete"
+                                   onclick="return confirm('Delete this task?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Todo Modal -->
+    <div class="modal fade" id="addTodoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Task</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{% url 'add_todo' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Select Farm <span class="text-danger">*</span></label>
+                            <select class="form-select" name="farm" required>
+                                <option value="">Choose farm...</option>
+                                {% for farm in user_farms %}
+                                <option value="{{ farm.id }}">{{ farm.farm_name }} ({{ farm.crop_type }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Task <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="task" placeholder="E.g., Water the crops" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="2" placeholder="Optional task details"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-select" name="priority">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Due Date</label>
+                                <input type="date" class="form-control" name="due_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Add Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AI Chatbot -->
+    <div id="chatbot-container">
+        <!-- Chatbot Toggle Button -->
+        <button id="chatbot-toggle" class="chatbot-toggle-btn">
+            <i class="bi bi-robot"></i>
+        </button>
+        
+        <!-- Chatbot Window -->
+        <div id="chatbot-window" class="chatbot-window">
+            <div class="chatbot-header">
+                <h5><i class="bi bi-robot"></i> Farm Assistant</h5>
+                <button id="chatbot-close" class="chatbot-close-btn">&times;</button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="message bot-message">
+                    Hello! I'm your Farm Assistant. How can I help you today?
+                    <div class="message-suggestions">
+                        <button class="suggestion-btn" data-message="What's the weather forecast for my location?">Weather Forecast</button>
+                        <button class="suggestion-btn" data-message="Tell me about crop care tips">Crop Care Tips</button>
+                        <button class="suggestion-btn" data-message="How can I improve soil health?">Soil Health</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input" placeholder="Ask about weather, crops, farming tips..." />
+                <button id="chatbot-send"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chatbot Styles -->
+    <style>
+        .chatbot-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-toggle-btn:hover {
+            background-color: #218838;
+            transform: scale(1.1);
+        }
+        
+        .chatbot-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 450px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .chatbot-header {
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chatbot-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .chatbot-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .bot-message {
+            background-color: #e9ecef;
+            align-self: flex-start;
+        }
+        
+        .user-message {
+            background-color: #28a745;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .message-suggestions {
+            margin-top: 10px;
+        }
+        
+        .suggestion-btn {
+            background-color: #fff;
+            border: 1px solid #28a745;
+            color: #28a745;
+            padding: 5px 10px;
+            margin: 3px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .suggestion-btn:hover {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .chatbot-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #dee2e6;
+            background-color: white;
+        }
+        
+        #chatbot-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        #chatbot-send {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        #chatbot-send:hover {
+            background-color: #218838;
+        }
+        
+        .chatbot-window.active {
+            display: flex;
+        }
+    </style>
+    
+    <!-- Chatbot JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotToggle = document.getElementById('chatbot-toggle');
+            const chatbotWindow = document.getElementById('chatbot-window');
+            const chatbotClose = document.getElementById('chatbot-close');
+            const chatbotInput = document.getElementById('chatbot-input');
+            const chatbotSend = document.getElementById('chatbot-send');
+            const chatbotMessages = document.getElementById('chatbot-messages');
+            const suggestionButtons = document.querySelectorAll('.suggestion-btn');
+            
+            // Toggle chatbot window
+            chatbotToggle.addEventListener('click', function() {
+                chatbotWindow.classList.toggle('active');
+            });
+            
+            // Close chatbot window
+            chatbotClose.addEventListener('click', function() {
+                chatbotWindow.classList.remove('active');
+            });
+            
+            // Send message on button click
+            chatbotSend.addEventListener('click', sendMessage);
+            
+            // Send message on Enter key
+            chatbotInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Handle suggestion buttons
+            suggestionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const message = this.getAttribute('data-message');
+                    addMessage(message, 'user');
+                    processUserMessage(message);
+                });
+            });
+            
+            // Function to send message
+            function sendMessage() {
+                const message = chatbotInput.value.trim();
+                if (message) {
+                    addMessage(message, 'user');
+                    chatbotInput.value = '';
+                    processUserMessage(message);
+                }
+            }
+            
+            // Function to add message to chat
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender + '-message');
+                messageDiv.textContent = text;
+                chatbotMessages.appendChild(messageDiv);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+            
+            // Function to process user message and generate response using Gemini API
+            function processUserMessage(message) {
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.id = 'typing-indicator';
+                typingIndicator.classList.add('message', 'bot-message');
+                typingIndicator.textContent = 'Thinking...';
+                chatbotMessages.appendChild(typingIndicator);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                
+                // Send request to Django backend which will use Gemini API
+                fetch('{% url "chatbot_query" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({message: message})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove typing indicator
+                    const typingIndicatorElement = document.getElementById('typing-indicator');
+                    if (typingIndicatorElement) {
+                        typingIndicatorElement.remove();
+                    }
+                    
+                    // Add bot response
+                    addMessage(data.response, 'bot');
+                })
+                .catch(error => {
+                    // Remove typing indicator
+                    const typingIndicatorElement = document.getElementById('typing-indicator');
+                    if (typingIndicatorElement) {
+                        typingIndicatorElement.remove();
+                    }
+                    
+                    // Add error message
+                    addMessage("Sorry, I encountered an error. Please try again.", 'bot');
+                    console.error('Error:', error);
+                });
+            }
+            
+            // Function to get CSRF token
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+</body>
+</html>
+

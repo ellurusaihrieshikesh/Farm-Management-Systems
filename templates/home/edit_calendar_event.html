@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Calendar Event - Farm Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}"><i class="bi bi-flower1"></i> FarmPortal</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-pencil"></i> Edit Calendar Event</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Farm <span class="text-danger">*</span></label>
+                                <select name="farm" class="form-select" required>
+                                    {% for farm in user_farms %}
+                                    <option value="{{ farm.id }}" {% if farm.id == event.farm.id %}selected{% endif %}>{{ farm.farm_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Event Type <span class="text-danger">*</span></label>
+                                <select name="event_type" class="form-select" required>
+                                    <option value="watering" {% if event.event_type == 'watering' %}selected{% endif %}>Watering</option>
+                                    <option value="fertilizing" {% if event.event_type == 'fertilizing' %}selected{% endif %}>Fertilizing</option>
+                                    <option value="pest_control" {% if event.event_type == 'pest_control' %}selected{% endif %}>Pest Control</option>
+                                    <option value="weeding" {% if event.event_type == 'weeding' %}selected{% endif %}>Weeding</option>
+                                    <option value="pruning" {% if event.event_type == 'pruning' %}selected{% endif %}>Pruning</option>
+                                    <option value="harvesting" {% if event.event_type == 'harvesting' %}selected{% endif %}>Harvesting</option>
+                                    <option value="soil_test" {% if event.event_type == 'soil_test' %}selected{% endif %}>Soil Test</option>
+                                    <option value="irrigation" {% if event.event_type == 'irrigation' %}selected{% endif %}>Irrigation</option>
+                                    <option value="planting" {% if event.event_type == 'planting' %}selected{% endif %}>Planting</option>
+                                    <option value="transplanting" {% if event.event_type == 'transplanting' %}selected{% endif %}>Transplanting</option>
+                                    <option value="other" {% if event.event_type == 'other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Date <span class="text-danger">*</span></label>
+                                <input type="date" name="date" class="form-control" value="{{ event.date|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="4">{{ event.description }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reminder (Days Before Event)</label>
+                                <input type="number" name="reminder_days" class="form-control" value="{{ event.reminder_days }}" min="0" max="30">
+                                <small class="form-text text-muted">Set to 0 for no reminder, or enter number of days before event to be reminded.</small>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" name="completed" class="form-check-input" id="completed" {% if event.completed %}checked{% endif %}>
+                                <label class="form-check-label" for="completed">Mark as completed</label>
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'calendar_events_list' %}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-success">Update Event</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

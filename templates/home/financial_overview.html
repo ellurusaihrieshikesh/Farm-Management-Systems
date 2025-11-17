@@ -1,0 +1,329 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Overview - Farm Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'dashboard' %}">
+                <i class="bi bi-flower1"></i> FarmPortal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'management' %}">Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'financial_overview' %}">Financial</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'edit_profile' %}">Welcome, {{ user.username }}!</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Financial Overview Content -->
+    <div class="container mt-5">
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="display-5"><i class="bi bi-cash-stack"></i> Financial Overview</h1>
+                    <div>
+                        <a href="{% url 'expense_list' %}" class="btn btn-outline-danger">
+                            <i class="bi bi-arrow-down-circle"></i> Expenses
+                        </a>
+                        <a href="{% url 'income_list' %}" class="btn btn-outline-success">
+                            <i class="bi bi-arrow-up-circle"></i> Income
+                        </a>
+                        <a href="{% url 'budget_list' %}" class="btn btn-outline-info">
+                            <i class="bi bi-piggy-bank"></i> Budgets
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Period Filter -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="GET" class="d-flex gap-2 align-items-center">
+                            <label class="form-label mb-0">Period:</label>
+                            <select name="period" class="form-select" style="width: auto;" onchange="this.form.submit()">
+                                <option value="7" {% if date_filter == '7' %}selected{% endif %}>Last 7 Days</option>
+                                <option value="30" {% if date_filter == '30' %}selected{% endif %}>Last 30 Days</option>
+                                <option value="90" {% if date_filter == '90' %}selected{% endif %}>Last 90 Days</option>
+                                <option value="365" {% if date_filter == '365' %}selected{% endif %}>Last Year</option>
+                                <option value="all" {% if date_filter == 'all' %}selected{% endif %}>All Time</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-arrow-down-circle"></i> Total Expenses</h5>
+                        <p class="card-text display-6">₹{{ total_expenses|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-arrow-up-circle"></i> Total Income</h5>
+                        <p class="card-text display-6">₹{{ total_income|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-white {% if net_profit >= 0 %}bg-info{% else %}bg-warning{% endif %}">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-graph-up"></i> Net Profit</h5>
+                        <p class="card-text display-6">₹{{ net_profit|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Expenses by Category</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="expensesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Income by Category</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Expenses</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_expenses %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Farm</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for expense in recent_expenses %}
+                                    <tr>
+                                        <td>{{ expense.date|date:"M d" }}</td>
+                                        <td>{{ expense.farm.farm_name }}</td>
+                                        <td>{{ expense.get_category_display }}</td>
+                                        <td class="text-danger">-₹{{ expense.amount|floatformat:2 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No expenses recorded yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Income</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_incomes %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Farm</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for income in recent_incomes %}
+                                    <tr>
+                                        <td>{{ income.date|date:"M d" }}</td>
+                                        <td>{{ income.farm.farm_name }}</td>
+                                        <td>{{ income.get_category_display }}</td>
+                                        <td class="text-success">+₹{{ income.amount|floatformat:2 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No income recorded yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Budgets -->
+        {% if active_budgets %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-piggy-bank"></i> Active Budgets</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Farm</th>
+                                        <th>Category</th>
+                                        <th>Allocated</th>
+                                        <th>Spent</th>
+                                        <th>Remaining</th>
+                                        <th>Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for budget in active_budgets %}
+                                    <tr>
+                                        <td>{{ budget.farm.farm_name }}</td>
+                                        <td>{{ budget.get_category_display }}</td>
+                                        <td>₹{{ budget.allocated_amount|floatformat:2 }}</td>
+                                        <td>₹{{ budget.get_spent_amount|floatformat:2 }}</td>
+                                        <td>₹{{ budget.get_remaining_amount|floatformat:2 }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar {% if budget.get_percentage_spent > 100 %}bg-danger{% elif budget.get_percentage_spent > 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ budget.get_percentage_spent }}%">
+                                                    {{ budget.get_percentage_spent|floatformat:0 }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Expenses Chart
+        {% if expenses_by_category %}
+        const expensesData = {
+            labels: [{% for item in expenses_by_category %}'{{ item.category|title }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Expenses',
+                data: [{% for item in expenses_by_category %}{{ item.total }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                    '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384', '#36A2EB', '#FFCE56'
+                ]
+            }]
+        };
+
+        const expensesCtx = document.getElementById('expensesChart').getContext('2d');
+        new Chart(expensesCtx, {
+            type: 'pie',
+            data: expensesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+        {% else %}
+        document.getElementById('expensesChart').parentElement.innerHTML = '<p class="text-muted text-center py-5">No expense data available</p>';
+        {% endif %}
+
+        // Income Chart
+        {% if incomes_by_category %}
+        const incomeData = {
+            labels: [{% for item in incomes_by_category %}'{{ item.category|title }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Income',
+                data: [{% for item in incomes_by_category %}{{ item.total }}{% if not forloop.last %},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56'
+                ]
+            }]
+        };
+
+        const incomeCtx = document.getElementById('incomeChart').getContext('2d');
+        new Chart(incomeCtx, {
+            type: 'pie',
+            data: incomeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+        {% else %}
+        document.getElementById('incomeChart').parentElement.innerHTML = '<p class="text-muted text-center py-5">No income data available</p>';
+        {% endif %}
+    </script>
+</body>
+</html>
+
